@@ -24,3 +24,8 @@ desktop.ini
 
 # Logs
 *.log
+
+# Build
+dist/
+build/
+*.spec
