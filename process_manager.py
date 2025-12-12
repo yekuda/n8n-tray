@@ -111,13 +111,27 @@ class ProcessManager:
     
     def stop_n8n(self):
         """n8n'i durdur"""
+        if self.n8n_process:
+            # Thread içinde durdur ki GUI donmasın
+            threading.Thread(target=self._stop_n8n_worker, daemon=True).start()
+        else:
+            if self.tray:
+                self.tray.showMessage("n8n", "n8n zaten kapalı.", QtWidgets.QSystemTrayIcon.Warning)
+            self.log_append("n8n zaten kapalı")
+    
+    def _stop_n8n_worker(self):
+        """n8n'i durduran worker thread"""
         try:
             if self.n8n_process:
                 try:
                     # /F: Zorla kapat, /T: Alt processleri de kapat (Tree kill)
-                    subprocess.call(['taskkill', '/F', '/T', '/PID', str(self.n8n_process.pid)],
-                                  stdout=subprocess.DEVNULL,
-                                  stderr=subprocess.DEVNULL)
+                    # CREATE_NO_WINDOW flag ekle
+                    subprocess.call(
+                        ['taskkill', '/F', '/T', '/PID', str(self.n8n_process.pid)],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        creationflags=subprocess.CREATE_NO_WINDOW
+                    )
                     self.n8n_process = None
                     self.log_append("n8n durduruldu (process tree temizlendi)")
                     
@@ -125,10 +139,6 @@ class ProcessManager:
                         self.update_status_callback()
                 except Exception as e:
                     self.log_append(f"n8n durdurulurken hata: {e}")
-            else:
-                if self.tray:
-                    self.tray.showMessage("n8n", "n8n zaten kapalı.", QtWidgets.QSystemTrayIcon.Warning)
-                self.log_append("n8n zaten kapalı")
         except Exception as e:
             self.log_append(f"n8n durdurma hatası: {e}")
     
@@ -164,13 +174,27 @@ class ProcessManager:
     
     def stop_cloudflare(self):
         """Cloudflare tunnel'ı durdur"""
+        if self.cloudflare_process:
+            # Thread içinde durdur ki GUI donmasın
+            threading.Thread(target=self._stop_cloudflare_worker, daemon=True).start()
+        else:
+            if self.tray:
+                self.tray.showMessage("Cloudflare", "Zaten kapalı.", QtWidgets.QSystemTrayIcon.Warning)
+            self.log_append("Cloudflare zaten kapalı")
+    
+    def _stop_cloudflare_worker(self):
+        """Cloudflare'i durduran worker thread"""
         try:
             if self.cloudflare_process:
                 try:
                     # Cloudflare için de process tree'yi temizle
-                    subprocess.call(['taskkill', '/F', '/T', '/PID', str(self.cloudflare_process.pid)],
-                                  stdout=subprocess.DEVNULL,
-                                  stderr=subprocess.DEVNULL)
+                    # CREATE_NO_WINDOW flag ekle
+                    subprocess.call(
+                        ['taskkill', '/F', '/T', '/PID', str(self.cloudflare_process.pid)],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        creationflags=subprocess.CREATE_NO_WINDOW
+                    )
                     self.cloudflare_process = None
                     self.log_append("Cloudflare durduruldu (process tree temizlendi)")
                     
@@ -178,10 +202,6 @@ class ProcessManager:
                         self.update_status_callback()
                 except Exception as e:
                     self.log_append(f"Cloudflare durdurulurken hata: {e}")
-            else:
-                if self.tray:
-                    self.tray.showMessage("Cloudflare", "Zaten kapalı.", QtWidgets.QSystemTrayIcon.Warning)
-                self.log_append("Cloudflare zaten kapalı")
         except Exception as e:
             self.log_append(f"Cloudflare durdurma hatası: {e}")
     
@@ -200,13 +220,17 @@ class ProcessManager:
             result = subprocess.run(
                 ['tasklist', '/FI', 'IMAGENAME eq node.exe', '/FO', 'CSV', '/NH'],
                 capture_output=True,
-                text=True
+                text=True,
+                creationflags=subprocess.CREATE_NO_WINDOW
             )
             
             if 'node.exe' in result.stdout:
-                subprocess.run(['taskkill', '/F', '/IM', 'node.exe'], 
-                             stdout=subprocess.DEVNULL, 
-                             stderr=subprocess.DEVNULL)
+                subprocess.run(
+                    ['taskkill', '/F', '/IM', 'node.exe'], 
+                    stdout=subprocess.DEVNULL, 
+                    stderr=subprocess.DEVNULL,
+                    creationflags=subprocess.CREATE_NO_WINDOW
+                )
                 self.log_append("EMERGENCY: Tüm node.exe process'leri zorla sonlandırıldı")
                 
                 # Global değişkeni temizle
