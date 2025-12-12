@@ -308,17 +308,41 @@ class MainWindow(QtWidgets.QWidget):
     
     # Button callbacks
     def on_start_n8n(self):
-        self.process_manager.start_n8n()
-        self.update_status()
+        try:
+            self.process_manager.start_n8n()
+            self.update_status()
+        except Exception as e:
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            self.log_text.append(f"[{timestamp}] n8n başlatma hatası: {e}")
+            QtWidgets.QMessageBox.critical(self, "Hata", f"n8n başlatılamadı: {e}")
     
     def on_stop_n8n(self):
-        self.process_manager.stop_n8n()
-        self.update_status()
+        try:
+            self.process_manager.stop_n8n()
+            self.update_status()
+        except Exception as e:
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            self.log_text.append(f"[{timestamp}] n8n durdurma hatası: {e}")
+            QtWidgets.QMessageBox.critical(self, "Hata", f"n8n durdurulamadı: {e}")
     
     def on_start_cloudflare(self):
-        self.process_manager.start_cloudflare()
-        self.update_status()
+        try:
+            self.process_manager.start_cloudflare()
+            self.update_status()
+        except Exception as e:
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            self.log_text.append(f"[{timestamp}] Cloudflare başlatma hatası: {e}")
+            QtWidgets.QMessageBox.critical(self, "Hata", f"Cloudflare başlatılamadı: {e}")
     
     def on_stop_cloudflare(self):
-        self.process_manager.stop_cloudflare()
-        self.update_status()
+        try:
+            self.process_manager.stop_cloudflare()
+            self.update_status()
+        except Exception as e:
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            self.log_text.append(f"[{timestamp}] Cloudflare durdurma hatası: {e}")
+            QtWidgets.QMessageBox.critical(self, "Hata", f"Cloudflare durdurulamadı: {e}")

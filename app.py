@@ -4,6 +4,7 @@ n8n ve Cloudflare tunnel'larını system tray'den yöneten uygulama.
 """
 
 import os
+import sys
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -21,7 +22,7 @@ sys.dont_write_bytecode = True
 from PyQt5 import QtWidgets, QtGui
 
 # Kendi modüllerimiz
-import process_manager
+from process_manager import ProcessManager
 from gui import MainWindow
 from tray_manager import create_tray
 
@@ -55,6 +56,9 @@ def main():
     icon_path = resource_path("icon.ico")
     icon = QtGui.QIcon(icon_path)
     app.setWindowIcon(icon) # Uygulama ikonu
+    
+    # Process manager instance oluştur
+    process_manager = ProcessManager()
     
     # Ana pencereyi oluştur
     window = MainWindow(icon, process_manager)
