@@ -152,3 +152,106 @@ BUTTON_STYLE_LOG_UTILITY = """
     }
 """
 
+# QMessageBox (Dialog) Stili - Modern Dark Theme
+MESSAGEBOX_STYLE = """
+    QMessageBox {
+        background-color: #121212;
+        color: #e8e8e8;
+        font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
+    }
+    QMessageBox QLabel {
+        color: #e8e8e8;
+        background-color: transparent;
+        font-size: 13px;
+    }
+    QMessageBox QPushButton {
+        background: #1f1f1f;
+        color: #e8e8e8;
+        border: 1px solid #2a2a2a;
+        border-radius: 4px;
+        padding: 6px 20px;
+        font-size: 12px;
+        font-weight: 500;
+        min-width: 70px;
+        min-height: 24px;
+    }
+    QMessageBox QPushButton:hover {
+        background: #252525;
+        border: 1px solid #333333;
+    }
+    QMessageBox QPushButton:pressed {
+        background: #1a1a1a;
+    }
+    QMessageBox QPushButton:default {
+        background: #1f1f1f;
+        border: 1px solid #4ec9b0;
+    }
+    QMessageBox QPushButton:default:hover {
+        background: #252525;
+        border: 1px solid #4ec9b0;
+    }
+"""
+
+# QMenu (Context Menu) Stili - Modern Dark Theme
+MENU_STYLE = """
+    QMenu {
+        background-color: #1a1a1a;
+        color: #e8e8e8;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        padding: 4px;
+        font-size: 12px;
+    }
+    QMenu::item {
+        background-color: transparent;
+        padding: 6px 24px 6px 12px;
+        border-radius: 3px;
+    }
+    QMenu::item:selected {
+        background-color: #252525;
+    }
+    QMenu::item:disabled {
+        color: #666666;
+    }
+    QMenu::separator {
+        height: 1px;
+        background: #2a2a2a;
+        margin: 4px 8px;
+    }
+"""
+
+# QFileDialog Stili - Modern Dark Theme
+FILEDIALOG_STYLE = """
+    QFileDialog {
+        background-color: #121212;
+        color: #e8e8e8;
+    }
+    QFileDialog QLabel {
+        color: #e8e8e8;
+    }
+    QFileDialog QPushButton {
+        background: #1f1f1f;
+        color: #e8e8e8;
+        border: 1px solid #2a2a2a;
+        border-radius: 4px;
+        padding: 6px 16px;
+        font-size: 12px;
+    }
+    QFileDialog QPushButton:hover {
+        background: #252525;
+    }
+    QFileDialog QTreeView, QFileDialog QListView {
+        background-color: #181818;
+        color: #e8e8e8;
+        border: 1px solid #2a2a2a;
+        border-radius: 4px;
+    }
+    QFileDialog QLineEdit {
+        background-color: #1f1f1f;
+        color: #e8e8e8;
+        border: 1px solid #2a2a2a;
+        border-radius: 4px;
+        padding: 4px 8px;
+    }
+"""
+

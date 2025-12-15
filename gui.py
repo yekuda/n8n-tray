@@ -5,6 +5,8 @@ Bu modül ana pencere ve tüm GUI bileşenlerini oluşturur.
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 import styles
+import ctypes
+import sys
 
 
 class MainWindow(QtWidgets.QWidget):
@@ -20,6 +22,13 @@ class MainWindow(QtWidgets.QWidget):
         self.setWindowTitle("n8n Control Panel")
         self.setWindowIcon(icon)
         self.setFixedSize(600, 520)
+        
+        # Global stil ayarları (tüm dialog'lar için)
+        app = QtWidgets.QApplication.instance()
+        if app:
+            app.setStyleSheet(styles.WINDOW_STYLE + styles.MESSAGEBOX_STYLE + 
+                            styles.MENU_STYLE + styles.FILEDIALOG_STYLE)
+        
         self.setStyleSheet(styles.WINDOW_STYLE)
         
         # Ana layout
@@ -48,6 +57,41 @@ class MainWindow(QtWidgets.QWidget):
         
         self.setLayout(layout)
         self.update_status()
+    
+    def enable_dark_titlebar(self):
+        """Windows 11 title bar'ını koyu yap"""
+        if sys.platform == "win32":
+            try:
+                hwnd = int(self.winId())
+                # DWMWA_USE_IMMERSIVE_DARK_MODE = 20 (Windows 11)
+                # DWMWA_USE_IMMERSIVE_DARK_MODE = 19 (Windows 10 build 19041+)
+                DWMWA_USE_IMMERSIVE_DARK_MODE = 20
+                
+                # Önce Windows 11 (20) deneyelim
+                value = ctypes.c_int(1)
+                result = ctypes.windll.dwmapi.DwmSetWindowAttribute(
+                    hwnd, 
+                    DWMWA_USE_IMMERSIVE_DARK_MODE,
+                    ctypes.byref(value),
+                    ctypes.sizeof(value)
+                )
+                
+                # Eğer başarısız olursa Windows 10 (19) deneyelim
+                if result != 0:
+                    DWMWA_USE_IMMERSIVE_DARK_MODE = 19
+                    ctypes.windll.dwmapi.DwmSetWindowAttribute(
+                        hwnd,
+                        DWMWA_USE_IMMERSIVE_DARK_MODE,
+                        ctypes.byref(value),
+                        ctypes.sizeof(value)
+                    )
+            except Exception as e:
+                print(f"Dark title bar ayarlanamadı: {e}")
+    
+    def showEvent(self, event):
+        """Pencere gösterildiğinde dark title bar'ı aktifleştir"""
+        super().showEvent(event)
+        self.enable_dark_titlebar()
     
     def create_header(self, layout):
         """Header oluştur"""
@@ -130,19 +174,23 @@ class MainWindow(QtWidgets.QWidget):
     def on_emergency_kill(self):
         """Emergency kill işlemi"""
         # Onay dialogu göster
-        reply = QtWidgets.QMessageBox.warning(
-            self,
-            "Emergency Kill Node.js",
+        msg_box = QtWidgets.QMessageBox(self)
+        msg_box.setIcon(QtWidgets.QMessageBox.Warning)
+        msg_box.setWindowTitle("Emergency Kill Node.js")
+        msg_box.setText(
             "Tüm Node.js process'lerini zorla sonlandırmak istiyor musunuz?\n\n"
             "Bu işlem:\n"
             "• Tüm node.exe process'lerini öldürür\n"
             "• n8n ve diğer Node.js uygulamaları kapanır\n"
             "• Kaydedilmemiş veriler kaybolabilir\n\n"
             "NOT: Cloudflare tunnel etkilenmez.\n\n"
-            "Devam etmek istiyor musunuz?",
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-            QtWidgets.QMessageBox.No
+            "Devam etmek istiyor musunuz?"
         )
+        msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
+        msg_box.setStyleSheet(styles.MESSAGEBOX_STYLE)
+        
+        reply = msg_box.exec_()
         
         if reply == QtWidgets.QMessageBox.Yes:
             self.process_manager.emergency_kill_all()
@@ -188,6 +236,7 @@ class MainWindow(QtWidgets.QWidget):
     def show_log_context_menu(self, position):
         """Log için context menu göster"""
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet(styles.MENU_STYLE)
         
         copy_action = menu.addAction("Copy All")
         clear_action = menu.addAction("Clear Log")
@@ -275,7 +324,12 @@ class MainWindow(QtWidgets.QWidget):
             from datetime import datetime
             timestamp = datetime.now().strftime("%H:%M:%S")
             self.log_text.append(f"[{timestamp}] n8n başlatma hatası: {e}")
-            QtWidgets.QMessageBox.critical(self, "Hata", f"n8n başlatılamadı: {e}")
+            msg = QtWidgets.QMessageBox(self)
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setWindowTitle("Hata")
+            msg.setText(f"n8n başlatılamadı: {e}")
+            msg.setStyleSheet(styles.MESSAGEBOX_STYLE)
+            msg.exec_()
     
     def on_stop_n8n(self):
         try:
@@ -285,7 +339,12 @@ class MainWindow(QtWidgets.QWidget):
             from datetime import datetime
             timestamp = datetime.now().strftime("%H:%M:%S")
             self.log_text.append(f"[{timestamp}] n8n durdurma hatası: {e}")
-            QtWidgets.QMessageBox.critical(self, "Hata", f"n8n durdurulamadı: {e}")
+            msg = QtWidgets.QMessageBox(self)
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setWindowTitle("Hata")
+            msg.setText(f"n8n durdurulamadı: {e}")
+            msg.setStyleSheet(styles.MESSAGEBOX_STYLE)
+            msg.exec_()
     
     def on_start_cloudflare(self):
         try:
@@ -295,7 +354,12 @@ class MainWindow(QtWidgets.QWidget):
             from datetime import datetime
             timestamp = datetime.now().strftime("%H:%M:%S")
             self.log_text.append(f"[{timestamp}] Cloudflare başlatma hatası: {e}")
-            QtWidgets.QMessageBox.critical(self, "Hata", f"Cloudflare başlatılamadı: {e}")
+            msg = QtWidgets.QMessageBox(self)
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setWindowTitle("Hata")
+            msg.setText(f"Cloudflare başlatılamadı: {e}")
+            msg.setStyleSheet(styles.MESSAGEBOX_STYLE)
+            msg.exec_()
     
     def on_stop_cloudflare(self):
         try:
@@ -305,4 +369,9 @@ class MainWindow(QtWidgets.QWidget):
             from datetime import datetime
             timestamp = datetime.now().strftime("%H:%M:%S")
             self.log_text.append(f"[{timestamp}] Cloudflare durdurma hatası: {e}")
-            QtWidgets.QMessageBox.critical(self, "Hata", f"Cloudflare durdurulamadı: {e}")
+            msg = QtWidgets.QMessageBox(self)
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setWindowTitle("Hata")
+            msg.setText(f"Cloudflare durdurulamadı: {e}")
+            msg.setStyleSheet(styles.MESSAGEBOX_STYLE)
+            msg.exec_()
