@@ -118,23 +118,7 @@ class MainWindow(QtWidgets.QWidget):
         
         # Emergency kill button - sade stil
         btn_emergency_kill = QtWidgets.QPushButton("Kill All Node.js")
-        btn_emergency_kill.setStyleSheet("""
-            QPushButton {
-                background: #3a3a3a;
-                color: #b0b0b0;
-                border: 1px solid #444444;
-                border-radius: 4px;
-                padding: 6px 14px;
-                font-size: 11px;
-            }
-            QPushButton:hover {
-                background: #454545;
-                border: 1px solid #555555;
-            }
-            QPushButton:pressed {
-                background: #303030;
-            }
-        """)
+        btn_emergency_kill.setStyleSheet(styles.BUTTON_STYLE_EMERGENCY)
         btn_emergency_kill.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         btn_emergency_kill.clicked.connect(self.on_emergency_kill)
         emergency_layout.addWidget(btn_emergency_kill)
@@ -180,38 +164,14 @@ class MainWindow(QtWidgets.QWidget):
         
         # Clear button
         btn_clear_log = QtWidgets.QPushButton("Clear")
-        btn_clear_log.setStyleSheet("""
-            QPushButton {
-                background: #3a3a3a;
-                color: #b0b0b0;
-                border: 1px solid #444444;
-                border-radius: 3px;
-                padding: 4px 12px;
-                font-size: 11px;
-            }
-            QPushButton:hover {
-                background: #454545;
-            }
-        """)
+        btn_clear_log.setStyleSheet(styles.BUTTON_STYLE_LOG_UTILITY)
         btn_clear_log.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         btn_clear_log.clicked.connect(self.clear_log)
         log_header_layout.addWidget(btn_clear_log)
         
         # Save button
         btn_save_log = QtWidgets.QPushButton("Save")
-        btn_save_log.setStyleSheet("""
-            QPushButton {
-                background: #3a3a3a;
-                color: #b0b0b0;
-                border: 1px solid #444444;
-                border-radius: 3px;
-                padding: 4px 12px;
-                font-size: 11px;
-            }
-            QPushButton:hover {
-                background: #454545;
-            }
-        """)
+        btn_save_log.setStyleSheet(styles.BUTTON_STYLE_LOG_UTILITY)
         btn_save_log.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         btn_save_log.clicked.connect(self.save_log)
         log_header_layout.addWidget(btn_save_log)

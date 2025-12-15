@@ -117,3 +117,38 @@ LOG_TEXT_STYLE = """
         background: #5a5a5a;
     }
 """
+
+# Emergency Kill Button Stili
+BUTTON_STYLE_EMERGENCY = """
+    QPushButton {
+        background: #3a3a3a;
+        color: #b0b0b0;
+        border: 1px solid #444444;
+        border-radius: 4px;
+        padding: 6px 14px;
+        font-size: 11px;
+    }
+    QPushButton:hover {
+        background: #454545;
+        border: 1px solid #555555;
+    }
+    QPushButton:pressed {
+        background: #303030;
+    }
+"""
+
+# Log Utility Button Stili (Clear, Save vb.)
+BUTTON_STYLE_LOG_UTILITY = """
+    QPushButton {
+        background: #3a3a3a;
+        color: #b0b0b0;
+        border: 1px solid #444444;
+        border-radius: 3px;
+        padding: 4px 12px;
+        font-size: 11px;
+    }
+    QPushButton:hover {
+        background: #454545;
+    }
+"""
+
