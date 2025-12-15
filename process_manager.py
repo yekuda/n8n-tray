@@ -9,12 +9,20 @@ import threading
 from PyQt5 import QtCore, QtWidgets
 
 
+class LogSignalEmitter(QtCore.QObject):
+    """Thread-safe log sinyali için yardımcı sınıf"""
+    log_message = QtCore.pyqtSignal(str)
+
+
 class ProcessManager:
     """Process yönetimi için class"""
     
     def __init__(self):
         self.n8n_process = None
         self.cloudflare_process = None
+        
+        # Signal emitter oluştur
+        self.log_emitter = LogSignalEmitter()
         
         # GUI referansları
         self.log_text = None
@@ -26,6 +34,9 @@ class ProcessManager:
         self.log_text = log_widget
         self.tray = tray_icon
         self.update_status_callback = status_callback
+        
+        # Log sinyal bağlantısını kur
+        self.log_emitter.log_message.connect(self._append_to_log)
     
     def log_append(self, text):
         """Log mesajı ekle (timestamp ile)"""
@@ -33,7 +44,15 @@ class ProcessManager:
             try:
                 from datetime import datetime
                 timestamp = datetime.now().strftime("%H:%M:%S")
-                self.log_text.append(f"[{timestamp}] {text}")
+                self.log_emitter.log_message.emit(f"[{timestamp}] {text}")
+            except Exception as e:
+                print(f"Log append error: {e}")
+    
+    def _append_to_log(self, text):
+        """Thread-safe log ekleme (main thread'de çalışır)"""
+        if self.log_text:
+            try:
+                self.log_text.append(text)
                 self.log_text.verticalScrollBar().setValue(self.log_text.verticalScrollBar().maximum())
             except Exception as e:
                 print(f"Log append error: {e}")
@@ -44,28 +63,18 @@ class ProcessManager:
             while proc and proc.poll() is None:
                 line = proc.stdout.readline()
                 if line:
-                    QtCore.QMetaObject.invokeMethod(
-                        self.log_text,
-                        "append",
-                        QtCore.Qt.QueuedConnection,
-                        QtCore.Q_ARG(str, f"[{tag}] {line.strip()}")
-                    )
+                    # Thread-safe sinyal emisyonu
+                    self.log_emitter.log_message.emit(f"[{tag}] {line.strip()}")
             
             # Process doğal olarak kapandıysa bilgi ver
             if tag == "n8n":
                 if self.n8n_process and self.n8n_process.poll() is not None:
                     self.n8n_process = None
-                    QtCore.QMetaObject.invokeMethod(
-                        self.log_text, "append", QtCore.Qt.QueuedConnection,
-                        QtCore.Q_ARG(str, "[n8n] Process beklenmedik şekilde kapandı")
-                    )
+                    self.log_emitter.log_message.emit("[n8n] Process beklenmedik şekilde kapandı")
             elif tag == "CF":
                 if self.cloudflare_process and self.cloudflare_process.poll() is not None:
                     self.cloudflare_process = None
-                    QtCore.QMetaObject.invokeMethod(
-                        self.log_text, "append", QtCore.Qt.QueuedConnection,
-                        QtCore.Q_ARG(str, "[CF] Process beklenmedik şekilde kapandı")
-                    )
+                    self.log_emitter.log_message.emit("[CF] Process beklenmedik şekilde kapandı")
             
             if self.update_status_callback:
                 self.update_status_callback()

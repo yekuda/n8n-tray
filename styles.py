@@ -11,8 +11,8 @@ COLORS = {
     'border': '#2a2a2a',
     'text_primary': '#e8e8e8',
     'text_secondary': '#a8a8a8',
-    'accent_green': '#4ec9b0',
-    'accent_red': '#f48771',
+    'accent_green': '#2e6f40',
+    'accent_red': '#fa003f',
 }
 
 # Ana Pencere Stili
@@ -36,23 +36,23 @@ HEADER_STYLE = """
 
 # Status Indicator - Çalışıyor (Yeşil) - Modern Card
 STATUS_RUNNING_STYLE = """
-    color: #4ec9b0;
+    color: #2e6f40;
     font-size: 13px;
     font-weight: 500;
     padding: 10px 14px;
     background: #1a1a1a;
-    border: 1px solid #4ec9b0;
+    border: 1px solid #2e6f40;
     border-radius: 6px;
 """
 
 # Status Indicator - Kapalı (Kırmızı) - Modern Card
 STATUS_STOPPED_STYLE = """
-    color: #f48771;
+    color: #fa003f;
     font-size: 13px;
     font-weight: 500;
     padding: 10px 14px;
     background: #1a1a1a;
-    border: 1px solid #f48771;
+    border: 1px solid #fa003f;
     border-radius: 6px;
 """
 
@@ -184,11 +184,11 @@ MESSAGEBOX_STYLE = """
     }
     QMessageBox QPushButton:default {
         background: #1f1f1f;
-        border: 1px solid #4ec9b0;
+        border: 1px solid #2e6f40;
     }
     QMessageBox QPushButton:default:hover {
         background: #252525;
-        border: 1px solid #4ec9b0;
+        border: 1px solid #2e6f40;
     }
 """
 
