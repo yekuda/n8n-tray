@@ -19,7 +19,7 @@ def resource_path(relative_path):
 # __pycache__ oluşmasını engelle
 sys.dont_write_bytecode = True
 
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore, QtNetwork
 
 # Kendi modüllerimiz
 from process_manager import ProcessManager
@@ -32,6 +32,26 @@ def main():
     
     # Qt Uygulaması
     app = QtWidgets.QApplication(sys.argv)
+    app.setApplicationName("n8n-tray")
+    
+    # Single Instance kontrolü - Sadece bir instance çalışabilir
+    server_name = "n8n_tray_single_instance"
+    socket = QtNetwork.QLocalSocket()
+    socket.connectToServer(server_name)
+    
+    # Eğer başka bir instance varsa, ona sinyal gönder ve çık
+    if socket.waitForConnected(500):
+        # Başka instance'a mesaj gönder (pencereyi göster)
+        socket.write(b"show")
+        socket.flush()
+        socket.waitForBytesWritten(1000)
+        socket.disconnectFromServer()
+        sys.exit(0)
+    
+    # İlk instance - Server oluştur
+    local_server = QtNetwork.QLocalServer()
+    local_server.removeServer(server_name)  # Eski server varsa temizle
+    local_server.listen(server_name)
     
     # Eğer sistem tepsisi desteklenmiyorsa uyar (Opsiyonel ama iyi bir kontrol)
     if not QtWidgets.QSystemTrayIcon.isSystemTrayAvailable():
@@ -75,6 +95,17 @@ def main():
     
     # Tray referansını process manager'a ver
     process_manager.tray = tray
+    
+    # Başka instance'tan gelen istekleri dinle
+    def on_new_connection():
+        client = local_server.nextPendingConnection()
+        if client and client.waitForReadyRead(1000):
+            message = client.readAll().data()
+            if message == b"show":
+                # Pencereyi göster
+                window.show_window()
+    
+    local_server.newConnection.connect(on_new_connection)
     
     # Uygulama başlarken pencereyi göster
     window.show_window()
