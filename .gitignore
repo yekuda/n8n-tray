@@ -25,7 +25,9 @@ desktop.ini
 # Logs
 *.log
 
-# Build
+# Build artifacts
 dist/
 build/
-*.spec
+setup/
+*.exe
+

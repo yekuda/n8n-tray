@@ -51,3 +51,25 @@ python app.py
 - `tray_manager.py`: Sistem tepsisi simge yönetimi.
 - `styles.py`: Arayüz stilleri.
 - `icon.ico`: Uygulama simgesi.
+
+## Windows Installer Oluşturma
+
+Profesyonel bir Windows installer (Setup.exe) oluşturmak için:
+
+### Gereksinimler
+1. [Inno Setup](https://jrsoftware.org/isdl.php) kurulu olmalı
+2. PyInstaller kurulu olmalı: `pip install pyinstaller`
+
+### Build Adımları
+
+```bash
+.\build_installer.bat
+```
+
+Bu script otomatik olarak:
+1. Eski build dosyalarını temizler
+2. PyInstaller ile EXE derler
+3. Inno Setup ile Setup.exe oluşturur
+
+Sonuç: `setup/n8n-Tray_Setup_v1.0.0.exe`
+
