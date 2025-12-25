@@ -155,31 +155,54 @@ class ProcessManager:
         """Cloudflare tunnel'ı başlat"""
         try:
             if self.cloudflare_process is None:
-                # CREATE_NO_WINDOW bayrağı ile console penceresi açılmasını engelle
                 self.cloudflare_process = subprocess.Popen(
-                    [r"C:\Cloudflare\cloudflared.exe", "tunnel", "run", "--url", "http://localhost:5678", "n8n-pc"],
+                    [
+                        r"C:\Cloudflare\cloudflared.exe",
+                        "tunnel",
+                        "run",
+                        "n8n"
+                    ],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     text=True,
                     creationflags=subprocess.CREATE_NO_WINDOW
                 )
-                
+
                 if self.tray:
-                    self.tray.showMessage("Cloudflare", "Cloudflare başlatıldı", QtWidgets.QSystemTrayIcon.Information)
-                
-                self.log_append("Cloudflare başlatıldı")
-                threading.Thread(target=self.poll_process, args=(self.cloudflare_process, "CF"), daemon=True).start()
-                
+                    self.tray.showMessage(
+                        "Cloudflare",
+                        "Cloudflare Tunnel başlatıldı",
+                        QtWidgets.QSystemTrayIcon.Information
+                    )
+
+                self.log_append("Cloudflare Tunnel başlatıldı")
+                threading.Thread(
+                    target=self.poll_process,
+                    args=(self.cloudflare_process, "CF"),
+                    daemon=True
+                ).start()
+
                 if self.update_status_callback:
                     self.update_status_callback()
+
             else:
                 if self.tray:
-                    self.tray.showMessage("Cloudflare", "Zaten açık.", QtWidgets.QSystemTrayIcon.Warning)
+                    self.tray.showMessage(
+                        "Cloudflare",
+                        "Cloudflare zaten çalışıyor",
+                        QtWidgets.QSystemTrayIcon.Warning
+                    )
                 self.log_append("Cloudflare zaten çalışıyor")
+
         except Exception as e:
             self.log_append(f"Cloudflare başlatma hatası: {e}")
             if self.tray:
-                self.tray.showMessage("Hata", f"Cloudflare başlatılamadı: {e}", QtWidgets.QSystemTrayIcon.Critical)
+                self.tray.showMessage(
+                    "Hata",
+                    f"Cloudflare başlatılamadı: {e}",
+                    QtWidgets.QSystemTrayIcon.Critical
+                )
+
     
     def stop_cloudflare(self):
         """Cloudflare tunnel'ı durdur"""
